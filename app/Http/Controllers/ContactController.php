@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Contact\StoreContactRequest;
+use App\Http\Requests\Contact\UpdateContactRequest;
+use App\Models\Category;
 use App\Models\Contact;
-use App\Http\Requests\StoreContactRequest;
-use App\Http\Requests\UpdateContactRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
@@ -13,7 +15,22 @@ class ContactController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $contacts = Contact::query()
+                ->with([
+                    'user',
+                    'category',
+                ])
+                ->where('user_id', Auth::id())
+                ->orderBy('id', 'desc')
+                ->paginate(10);
+
+            return view('contacts.index', [
+                'contacts' => $contacts
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -21,7 +38,17 @@ class ContactController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            $contact = new Contact();
+            $categories = Category::all();
+
+            return view('contacts.create', [
+                'contact' => $contact,
+                'categories' => $categories
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -29,7 +56,15 @@ class ContactController extends Controller
      */
     public function store(StoreContactRequest $request)
     {
-        //
+        try {
+            $data= $request->validated();
+
+            Contact::create($data);
+
+            return to_route('contacts.index')->with('sessionMessage', 'Contacto Creado Correctamente');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -37,7 +72,18 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        //
+        try {
+            $contact->load([
+                    'user',
+                    'category',
+            ]);
+            
+            return view('contacts.show', [
+                'contact' => $contact
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -45,7 +91,16 @@ class ContactController extends Controller
      */
     public function edit(Contact $contact)
     {
-        //
+        try {
+            $categories = Category::all();
+
+            return view('contacts.edit', [
+                'contact' => $contact,
+                'categories' => $categories
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -53,7 +108,16 @@ class ContactController extends Controller
      */
     public function update(UpdateContactRequest $request, Contact $contact)
     {
-        //
+        try {
+            $data= $request->validated();
+
+            $contact->update($data);
+
+
+            return to_route('contacts.index')->with('sessionMessage', 'Contacto Actualizado Correctamente');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -61,6 +125,13 @@ class ContactController extends Controller
      */
     public function destroy(Contact $contact)
     {
-        //
+        try {
+            $contact->delete();
+
+
+            return to_route('contacts.index')->with('sessionMessage', 'Contacto Eliminado Correctamente');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

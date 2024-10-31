@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://agendacontactos.test'),
+    'url' => env('APP_URL', 'http://agendacontactossimple.test'),
 
     /*
     |--------------------------------------------------------------------------

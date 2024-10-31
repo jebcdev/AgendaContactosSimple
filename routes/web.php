@@ -15,6 +15,8 @@ Route::get('/', _SiteController::class)->name('index');
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/admin', [_SiteController::class,'admin'])->name('admin.index');
+
     Route::resource('/categories', CategoryController::class)->names('categories');
     
     Route::resource('/contacts', ContactController::class)->names('contacts');
